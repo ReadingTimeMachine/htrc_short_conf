@@ -59,6 +59,11 @@ import pytesseract
 if inParallel:
     yt.enable_parallelism()
     
+# debug
+from importlib import reload
+import ocr_and_image_processing_utils
+reload(ocr_and_image_processing_utils)
+
 from ocr_and_image_processing_utils import get_already_ocr_processed, find_pickle_file_name, \
    get_random_page_list, find_squares_auto, cull_squares_and_dewarp, angles_results_from_ocr
 
@@ -79,7 +84,8 @@ if yt.is_root(): print('working with pickle file:', pickle_file_name)
 if config.ocr_list_file is None:
     ws, pageNums, pdfarts = get_random_page_list(wsAlreadyDone,
                                                  full_article_pdfs_dir=full_article_pdfs_dir,
-                                                nRandom_ocr_image=nRandom_ocr_image)
+                                                nRandom_ocr_image=nRandom_ocr_image, 
+                                                 max_pages=None)
 else:
     if yt.is_root(): print('Using a OCR list -- ', config.ocr_list_file)
     import pandas as pd
@@ -106,6 +112,8 @@ my_storage = {}
 start_time = time.time()
 if yt.is_root(): print('START: ', time.ctime(start_time))
 times_tracking = np.array([]) # I don't think this is used anymore...
+
+#import sys;sys.exit()
 
 
 for sto, iw in yt.parallel_objects(wsInds, nprocs, storage=my_storage):    

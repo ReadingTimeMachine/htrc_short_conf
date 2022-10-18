@@ -59,7 +59,13 @@ def find_pickle_file_name(ocr_results_dir=None, pickle_file_head=None):
 
 # find the list of PDFs/Images/Jpegs you want to process
 def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
-                         nRandom_ocr_image=None):
+                         nRandom_ocr_image=None, max_pages=10):
+    """
+    wsAlreadyDone : calculated by parsing some pickle files (do not need to generate your own)
+    full_article_pdfs_dir : where full article PDFs are stored, change in the config file
+    nRandom_ocr_image : how many pages to OCR
+    max_pages : how many maximum pages to assume for an article, if set to None -- will default to calculating on the fly(?)
+    """
     if full_article_pdfs_dir is None: full_article_pdfs_dir=config.full_article_pdfs_dir
     if nRandom_ocr_image is None: nRandom_ocr_image = config.nRandom_ocr_image
     # get list of possible files from what has been downloaded in full article PDFs
@@ -68,6 +74,13 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
         print('working with:', len(pdfarts), 'full article PDFs, will pull random pages from these')
     elif is_root():
         print('no PDFs, going to look for bit maps')
+        
+    #print('here',nRandom_ocr_image)
+    
+    if max_pages is None: # assume no cap on pages, or at least a silly-big one
+        max_pages_here = 1e6
+    else:
+        max_pages_here = max_pages
 
     # parse and construct random list -- find number of pages in PDF's and select from them randomly too
     if len(pdfarts): # if we have pdfs
@@ -76,7 +89,7 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
         ws = []; pageNums = []
         iloop = 0
         while (len(ws) < nRandom_ocr_image):
-            if (iloop>=len(pdfarts)*10): # assume ~10 pages per article
+            if (iloop>=len(pdfarts)*max_pages_here): # assume ~10 pages per article
                 print('no more files!')
                 break
             f = pdfarts[pdfRandInts[iloop%len(pdfarts)]]
@@ -99,7 +112,10 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
                             pages_count = resolve1(document.catalog['Pages'])['Count']  
                         else:
                             pages_count = 1
+            # update max_pages
+            if max_pages is None: max_pages_here = pages_count
             if parsed:
+                #print('pages count', pages_count)
                 # grab a random page
                 pageInt = np.random.choice(pages_count,pages_count,replace=False)
                 # check for already having
@@ -112,6 +128,8 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
                 # append if found!
                 if iloop2-2 < pages_count: # didn't run out of pages
                     ws.append(f); pageNums.append(int(pageInt[iloop2-1]))
+                    
+                #print('pagenums', pageNums, 'len ws', len(ws))
 
             iloop += 1
         if is_root(): print('end loop to get pages of PDFs, iloop=',iloop)
