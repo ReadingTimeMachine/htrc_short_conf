@@ -392,6 +392,10 @@ def find_squares_auto(img, results_culled, angles_culled,
         #print('Rotated image detected')
     elif myRot == 0:
         rotatedImage = False
+    elif np.isnan(myRot):
+        myRot = 0.0
+        print('Rotation is NaN -- setting to 0')
+        rotatedImage = False
     else:
         print('rotation issue') 
         print(myRot)
