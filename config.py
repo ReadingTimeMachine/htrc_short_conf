@@ -20,6 +20,7 @@ save_binary_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalizatio
 make_sense_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/Annotations/MakeSenseAnnotations/'
 
 # 5. What jar file for pdffigures2?
+# NOTE: need java version 8 installed (or later I think)
 #pdffigures_jar_path = '/Users/jillnaiman/Downloads/ScanBank/bin/pdffigures2-assembly-0.1.0.jar' # use scanbank's
 pdffigures_jar_path = '/Users/jnaiman/figure_and_caption_extraction/bin/pdffigures2-assembly-0.1.0.jar' # use ours
 

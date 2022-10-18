@@ -125,13 +125,23 @@ def get_makesense_info_and_years(df,make_sense_dir=None):
     msf = glob(make_sense_dir + 'labels_*csv')
     mysquares = []; myfnames = []; myws=[]; myhs=[] 
     for f in msf:
-        d = pd.read_csv(f, names=['class','x','y', 'w','h','fname','wm','hm'])
+        # check for header names
+        with open(f,'r') as ftrial:
+            text = ftrial.readline()
+            if 'label_name' in text: # have header, overwrite
+                d = pd.read_csv(f, 
+                                names=['class','x','y', 'w','h','fname','wm','hm'],
+                               skiprows=1)
+            else: # no header
+                d = pd.read_csv(f, names=['class','x','y', 'w','h','fname','wm','hm'])
         # collapse onto unique fig names
         fns = d['fname'].unique()
+        #print(fns)
         for ff in fns:
             mys = []#; mycs = []
             d2 = d.loc[d['fname']==ff]
             ff2 = ff[:ff.rfind('.')+1]
+            #print(ff2)
             if ff2[-1] == '.': ff2 = ff2[:-1]
             myfnames.append(ff2)
             for index, row in d2.iterrows():
@@ -173,7 +183,7 @@ def get_years(dd):
             #pdflist.append(dlinks[ind])
             pdflist.append(config.full_article_pdfs_dir + pdfbase.split('_p')[0]+'.pdf')
         else:
-            if is_root(): print('no pdf for', f)
+            if is_root(): print('no year pdf for', f)
             #years = np.append(years, -1)
             #years = np.unique(years)
             years_list.append(-1)
