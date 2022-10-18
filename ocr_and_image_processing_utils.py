@@ -382,8 +382,8 @@ def find_squares_auto(img, results_culled, angles_culled,
         backtorgb = img.copy()
         img = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
 
-    if len(mode(angles_culled).mode) > 0:
-        myRot = mode(angles_culled).mode[0]
+    if len(mode(angles_culled,keepdims=True).mode) > 0:
+        myRot = mode(angles_culled,keepdims=True).mode[0]
     else:
         myRot = -50
     badRotation = False
@@ -447,7 +447,7 @@ def find_squares_auto(img, results_culled, angles_culled,
 
             
     # what is "white" here?
-    myThresh = mode(img.flatten()).mode[0]
+    myThresh = mode(img.flatten(),keepdims=True).mode[0]
 
     # all
     grayShowImg = showImg.copy()
