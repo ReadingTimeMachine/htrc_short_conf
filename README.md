@@ -62,9 +62,10 @@ Note: for this to work, you need to have java > 8 installed (should be in the co
  * `generate_features.py`
  
  
-### 6. Post-process
+### 6. Find boxes and post-process
 
- * `post_process_tfrecords.py`
+ * Reading Time Machine: `post_process_tfrecords.py`
+ * detectron2: `run_detectron2_batch.py` (see the `run_detectron2.ipynb` for more details)
  
  
 ### 7. Check out metrics
