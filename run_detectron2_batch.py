@@ -137,9 +137,15 @@ for sto, ipage in yt.parallel_objects(wsInds, nProcs, storage=my_storage):
     outputs = predictor(img)
     
     instances = outputs["instances"].to("cpu")
-    pred_boxes = instances.pred_boxes
-    scores = instances.scores
-    pred_classes = instances.pred_classes
+    pred_boxes1 = instances.pred_boxes
+    scores1 = instances.scores
+    pred_classes1 = instances.pred_classes
+    
+    pred_boxes = []; scores = []; pred_classes = [] # to numpy
+    for p,ss,c in zip(pred_boxes1,scores1,pred_classes1):
+        pred_boxes.append(p.numpy())
+        scores.append(ss.numpy())
+        pred_classes.append(c.numpy())
     
 #     # also get true boxes
 #     # there is a lot of mess here that gets and formats all true boxes and 
