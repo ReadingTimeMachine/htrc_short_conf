@@ -43,6 +43,8 @@ pdffigures_dpi = 300 # this makes around the right size
 # -----------------------------------------------
 # -----------------------------------------------
     
+from threading import Lock
+
 import numpy as np
 import yt
 import time  
@@ -52,8 +54,10 @@ from wand.color import Color
 from PIL import Image
 from os import remove
 import pickle
+import pandas as pd
 
 import pytesseract
+import os
 
 if inParallel:
     yt.enable_parallelism()
@@ -71,34 +75,69 @@ from ocr_and_image_processing_utils import get_already_ocr_processed, find_pickl
 
 # -----------------------------------------------
 
+# spacing
+print('')
+print('')
+print('')
 
-#**this random selection has to be done on lock!!!**
-# Get all already done pages... 
-wsAlreadyDone = get_already_ocr_processed(ocr_results_dir=ocr_results_dir)
+if tmp_storage_dir is None:
+    tmp_storage_dir = config.tmp_storage_dir
 
-# find the pickle file we will process next
-pickle_file_name = find_pickle_file_name(ocr_results_dir=ocr_results_dir)
+# lock the creation of files
+def create_files(lock):
+    if os.path.isfile(ocr_results_dir + 'done'): os.remove(ocr_results_dir + 'done') # test to make sure we don't move on in parallel too soon
+    if yt.is_root():
+        # Get all already done pages... 
+        wsAlreadyDone = get_already_ocr_processed(ocr_results_dir=ocr_results_dir)
 
-if yt.is_root(): print('working with pickle file:', pickle_file_name)
+        # find the pickle file we will process next
+        pickle_file_name = find_pickle_file_name(ocr_results_dir=ocr_results_dir)
 
-# get randomly selected articles and pages
-if config.ocr_list_file is None:
-    ws, pageNums, pdfarts = get_random_page_list(wsAlreadyDone,
-                                                 full_article_pdfs_dir=full_article_pdfs_dir,
-                                                nRandom_ocr_image=nRandom_ocr_image, 
-                                                 max_pages=None)
-else:
-    if yt.is_root(): print('Using a OCR list -- ', config.ocr_list_file)
-    import pandas as pd
-    df = pd.read_csv(config.ocr_list_file)
-    ws = df['filename'].values
-    pageNums = df['pageNum'].values
-    pdfarts = ws.copy()
-    if yt.is_root(): print('have ', len(ws), ' entries')
+        if yt.is_root(): print('working with pickle file:', pickle_file_name)
+
+        pdfarts = None
+
+        # get randomly selected articles and pages
+        if config.ocr_list_file is None:
+            ws, pageNums, pdfarts = get_random_page_list(wsAlreadyDone,
+                                                         full_article_pdfs_dir=full_article_pdfs_dir,
+                                                        nRandom_ocr_image=nRandom_ocr_image, 
+                                                         max_pages=None)
+            if pdfarts is not None: 
+                pdfarts = np.repeat(True,len(ws))
+            else:
+                pdfarts = np.repeat(False, len(ws))
+        else:
+            if yt.is_root(): print('Using a OCR list -- ', config.ocr_list_file)
+            df = pd.read_csv(config.ocr_list_file)
+            ws = df['filename'].values
+            pageNums = df['pageNum'].values
+            #pdfarts = ws.copy()
+            if yt.is_root(): print('have ', len(ws), ' entries')
+            pdfarts = np.repeat(True,len(ws))
+
+        # save as a CSV file
+        df = pd.DataFrame({'ws':ws, 'pageNums':pageNums,'pdfarts':pdfarts})
+        df.to_csv(tmp_storage_dir + 'ocr_list.csv',index=False)
+
+        # done
+        with open(ocr_results_dir + 'done','w') as ffd:
+            print('done!',file=ffd)
+        print(ocr_results_dir + 'done')
+
+
+# in theory, this should stop the parallel stuff until the folder
+#. has been created, but I'm not 100% sure on this one
+my_lock = Lock()
+create_files(my_lock)
+
+# get df
+df = pd.read_csv(tmp_storage_dir + 'ocr_list.csv')
+ws = df['ws'].values.astype('str').tolist()
+pageNums = df['pageNums'].values.astype('int').tolist()
+pdfarts = df['pdfarts'].values.astype('bool').tolist()
+pdfarts = pdfarts[0]
     
-    
-import sys; sys.exit()
-
 wsInds = np.arange(0,len(ws))
     
 # debug
@@ -116,7 +155,6 @@ start_time = time.time()
 if yt.is_root(): print('START: ', time.ctime(start_time))
 times_tracking = np.array([]) # I don't think this is used anymore...
 
-import sys;sys.exit()
 
 
 for sto, iw in yt.parallel_objects(wsInds, nprocs, storage=my_storage):    
@@ -125,7 +163,7 @@ for sto, iw in yt.parallel_objects(wsInds, nprocs, storage=my_storage):
     ######################## GET PDF AND MAKE IMAGE ###################
 
     # read PDF file into memory, if using PDFs
-    if pdfarts is not None:
+    if pdfarts:
         wimgPDF = WandImage(filename=ws[iw] +'[' + str(int(pageNums[iw])) + ']', 
                             resolution=pdffigures_dpi*2, format='pdf') #2x DPI which shrinks later
         thisSeq = wimgPDF.sequence
@@ -135,7 +173,7 @@ for sto, iw in yt.parallel_objects(wsInds, nprocs, storage=my_storage):
     imPDF = thisSeq[0] # load PDF page into memory
     iimPDF = pageNums[iw] # get page number as well
 
-    if pdfarts is not None: # have PDFs
+    if pdfarts: # have PDFs
         checkws = ws[iw].split('/')[-1].split('.pdf')[0] # for outputting file
         
         # make sure we do our best to capture accurate text/images
@@ -198,7 +236,7 @@ for sto, iw in yt.parallel_objects(wsInds, nprocs, storage=my_storage):
 
     sto.result = [imgImageProc,ws[iw], hocr, results_def, rotations, saved_squares_culled, color_bars,cin1,cout1]    
     # remove tmp TIFF image for storage reasons if doing PDF processing
-    if pdfarts is not None: # have PDFs
+    if pdfarts: # have PDFs
         try:
             remove(imOCRName)
         except:
