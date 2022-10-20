@@ -20,7 +20,6 @@ import config
 
 debug = False
 
-# YOU NEED TO DO download_ocr_and_pdfminer_whole_pages_batch.py BEFORE THIS ONE
 
 # naming structure here
 nprocs = config.nProcs

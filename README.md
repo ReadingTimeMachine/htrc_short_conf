@@ -42,6 +42,7 @@ You will also need to download the trained weights [which you can get from the l
 
 So far the list is:
  * https://babel.hathitrust.org/cgi/pt?id=uiug.30112101602172&view=1up&seq=16&skin=2021
+ * https://babel.hathitrust.org/cgi/pt?id=osu.32435023323769&view=1up&seq=199
  
 ### 2. Run OCR (if needed)
 
