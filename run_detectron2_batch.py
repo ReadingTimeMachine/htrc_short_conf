@@ -122,13 +122,30 @@ cfg = setup_cfg(config_file, weights_file)
 predictor = DefaultPredictor(cfg)
 
 # get pages
-pages = glob(pages_dir + '*')
+#pages = glob(pages_dir + '*')
+
+# let's get all of the ocr files
+ocrFiles = get_all_ocr_files(ocr_results_dir=ocr_results_dir)
+# get important quantities from these files
+if yt.is_root(): print('retreiving OCR data, this can take a moment...')
+ws, paragraphs, squares, html, rotations,colorbars = collect_ocr_process_results(ocrFiles)
+# # create dataframe
+# df = pd.DataFrame({'ws':ws, 'paragraphs':paragraphs, 'squares':squares, 
+#                    'hocr':html, 'rotation':rotations, 'colorbars':colorbars})#, 'pdfwords':pdfwords})
+# df = df.drop_duplicates(subset='ws')
+# df = df.set_index('ws')
+ws = np.unique(ws)
+pages = []
+for w in ws:
+    pages.append(images_jpeg_dir + w)
 
 my_storage = {}
 
 wsInds = np.arange(0,len(pages))
 
 iMod = 10
+
+#import sys; sys.exit()
 
 for sto, ipage in yt.parallel_objects(wsInds, nProcs, storage=my_storage):
     if ipage%iMod == 0: print('on', ipage, 'of', len(wsInds)-1)

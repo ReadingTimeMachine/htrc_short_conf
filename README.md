@@ -44,7 +44,7 @@ So far the list is:
  * https://babel.hathitrust.org/cgi/pt?id=uiug.30112101602172&view=1up&seq=16&skin=2021
  * https://babel.hathitrust.org/cgi/pt?id=osu.32435023323769&view=1up&seq=199
  
-### 2. Run OCR (if needed)
+### 2. Run OCR 
 
  * `ocr_and_image_processing_batch.py`
  
@@ -63,9 +63,9 @@ Note: for this to work, you need to have java > 8 installed (should be in the co
  * `generate_features.py`
  
  
-### 6. Find boxes and post-process
+### 6. Find boxes and post-process -- All methods
 
- * Reading Time Machine: `post_process_tfrecords.py`
+ * Reading Time Machine: `post_process_tfrecords.py` (note: this is typically *not* done in parallel)
  * detectron2: `run_detectron2_batch.py` (see the `run_detectron2.ipynb` for more details)
  
  

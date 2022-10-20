@@ -76,12 +76,17 @@ from ocr_and_image_processing_utils import get_already_ocr_processed, find_pickl
 # -----------------------------------------------
 
 # spacing
-print('')
-print('')
-print('')
+if yt.is_root()
+    print('')
+    print('')
+    print('')
 
 if tmp_storage_dir is None:
     tmp_storage_dir = config.tmp_storage_dir
+
+# find the pickle file we will process next
+pickle_file_name = find_pickle_file_name(ocr_results_dir=ocr_results_dir)
+
 
 # lock the creation of files
 def create_files(lock):
@@ -89,9 +94,6 @@ def create_files(lock):
     if yt.is_root():
         # Get all already done pages... 
         wsAlreadyDone = get_already_ocr_processed(ocr_results_dir=ocr_results_dir)
-
-        # find the pickle file we will process next
-        pickle_file_name = find_pickle_file_name(ocr_results_dir=ocr_results_dir)
 
         if yt.is_root(): print('working with pickle file:', pickle_file_name)
 
