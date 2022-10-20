@@ -1,7 +1,7 @@
 # for benchmarks, otherwise set to None
 # HTRC papers
 ocr_results_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/OCR_processing_htrc/'
-nRandom_ocr_image = 1500 # for testing
+nRandom_ocr_image = 20 # for testing
 full_article_pdfs_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/data/htrc/pdfs/'
 images_jpeg_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/Pages_htrc/RandomSingleFromPDFIndexed/'
 tmp_storage_dir = None
@@ -71,6 +71,8 @@ from ocr_and_image_processing_utils import get_already_ocr_processed, find_pickl
 
 # -----------------------------------------------
 
+
+#**this random selection has to be done on lock!!!**
 # Get all already done pages... 
 wsAlreadyDone = get_already_ocr_processed(ocr_results_dir=ocr_results_dir)
 
@@ -94,6 +96,8 @@ else:
     pdfarts = ws.copy()
     if yt.is_root(): print('have ', len(ws), ' entries')
     
+    
+import sys; sys.exit()
 
 wsInds = np.arange(0,len(ws))
     
@@ -112,7 +116,7 @@ start_time = time.time()
 if yt.is_root(): print('START: ', time.ctime(start_time))
 times_tracking = np.array([]) # I don't think this is used anymore...
 
-#import sys;sys.exit()
+import sys;sys.exit()
 
 
 for sto, iw in yt.parallel_objects(wsInds, nprocs, storage=my_storage):    
