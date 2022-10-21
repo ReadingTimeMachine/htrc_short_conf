@@ -66,8 +66,9 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
     wsAlreadyDone : calculated by parsing some pickle files (do not need to generate your own)
     full_article_pdfs_dir : where full article PDFs are stored, change in the config file
     nRandom_ocr_image : how many pages to OCR
-    max_pages : how many maximum pages to assume for an article, if set to None -- will default to all pages of all articles
-       this is not fully implemented yet!!!!
+    max_pages : how many maximum pages to assume for an article, 
+        if set to None -- will default to all pages of all 
+        articles, otherwise max number of pages pulled per article
     """
     if full_article_pdfs_dir is None: full_article_pdfs_dir=config.full_article_pdfs_dir
     if nRandom_ocr_image is None: nRandom_ocr_image = config.nRandom_ocr_image
@@ -80,10 +81,10 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
         
     #print('here',nRandom_ocr_image)
     
-    if max_pages is None: # assume no cap on pages, or at least a silly-big one
-        max_pages_here = 1e6
-    else:
-        max_pages_here = max_pages
+    # if max_pages is None: # assume no cap on pages, or at least a silly-big one
+    #     max_pages_here = 1e6
+    # else:
+    #     max_pages_here = max_pages
 
     # parse and construct random list -- find number of pages in PDF's and select from them randomly too
     if len(pdfarts): # if we have pdfs
@@ -150,7 +151,7 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
                 try:
                     w = wsalready[ind]
                     alreadyDone = w['done']
-                    hasPaper = True
+                    hasPaper = True # we do have this paper, have done it before at least a bit
                 except:
                     pass
                 if not alreadyDone: # not full?
@@ -177,8 +178,9 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
                     pages = np.linspace(0,pages_count-1,pages_count).astype('int')
                     # figure out which not done
                     if hasPaper:
-                        left = pages[~np.isin(np.arange(len(pages)),w[ind]['pages'])]
-                        dones = pages[np.isin(np.arange(len(pages)),w[ind]['pages'])]
+                        #print(ind,w)
+                        left = pages[~np.isin(np.arange(len(pages)),w['pages'])]
+                        dones = pages[np.isin(np.arange(len(pages)),w['pages'])]
                     else:
                         left = pages
                         dones = []
@@ -198,6 +200,9 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
                 if verbose: print('removing ', pdfs_todo[keys[ind]], 'as no pages left:', pages_left)
                 del pdfs_todo[keys[ind]]
                 continue # resume loop
+            elif max_pages is not None and len(pdfs_todo[keys[ind]]['pages_done']) >= max_pages:
+                del pdfs_todo[keys[ind]]
+                continue # resume loop                
             else: # go on...
                 # which page?
                 pages = pdfs_todo[keys[ind]]['pages_left']

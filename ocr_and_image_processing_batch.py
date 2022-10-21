@@ -6,6 +6,10 @@ full_article_pdfs_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocal
 images_jpeg_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/Pages_htrc/RandomSingleFromPDFIndexed/'
 tmp_storage_dir = None
 
+# cap the number of pages per article?
+# set to None if all pages
+max_pages = 20
+
 
 
 # # back to config-file defaults
@@ -76,7 +80,7 @@ from ocr_and_image_processing_utils import get_already_ocr_processed, find_pickl
 # -----------------------------------------------
 
 # spacing
-if yt.is_root()
+if yt.is_root():
     print('')
     print('')
     print('')
@@ -104,7 +108,7 @@ def create_files(lock):
             ws, pageNums, pdfarts = get_random_page_list(wsAlreadyDone,
                                                          full_article_pdfs_dir=full_article_pdfs_dir,
                                                         nRandom_ocr_image=nRandom_ocr_image, 
-                                                         max_pages=None)
+                                                         max_pages=max_pages)
             if pdfarts is not None: 
                 pdfarts = np.repeat(True,len(ws))
             else:

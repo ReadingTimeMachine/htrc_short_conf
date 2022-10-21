@@ -124,16 +124,11 @@ predictor = DefaultPredictor(cfg)
 # get pages
 #pages = glob(pages_dir + '*')
 
-# let's get all of the ocr files
+# make sure to have same files as our process
 ocrFiles = get_all_ocr_files(ocr_results_dir=ocr_results_dir)
 # get important quantities from these files
 if yt.is_root(): print('retreiving OCR data, this can take a moment...')
 ws, paragraphs, squares, html, rotations,colorbars = collect_ocr_process_results(ocrFiles)
-# # create dataframe
-# df = pd.DataFrame({'ws':ws, 'paragraphs':paragraphs, 'squares':squares, 
-#                    'hocr':html, 'rotation':rotations, 'colorbars':colorbars})#, 'pdfwords':pdfwords})
-# df = df.drop_duplicates(subset='ws')
-# df = df.set_index('ws')
 ws = np.unique(ws)
 pages = []
 for w in ws:
