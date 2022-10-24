@@ -41,9 +41,10 @@ You will also need to download the trained weights [which you can get from the l
 ### 1. Download papers from HTRC
 
 So far the list is:
- * https://babel.hathitrust.org/cgi/pt?id=uiug.30112101602172&view=1up&seq=16&skin=2021
- * https://babel.hathitrust.org/cgi/pt?id=osu.32435023323769&view=1up&seq=199
+ * https://babel.hathitrust.org/cgi/pt?id=uiug.30112101602172&view=1up&seq=16&skin=2021 (1963)
+ * https://babel.hathitrust.org/cgi/pt?id=osu.32435023323769&view=1up&seq=199 (1985)
  * https://babel.hathitrust.org/cgi/pt?id=uc1.31210014680225&view=1up&seq=1 (2003)
+ * https://babel.hathitrust.org/cgi/pt?id=uc1.32106020677263&view=1up&seq=158 (1989)
  
 ### 2. Run OCR 
 
@@ -66,7 +67,7 @@ Note: for this to work, you need to have java > 8 installed (should be in the co
  
 ### 6. Find boxes and post-process -- All methods
 
- * Reading Time Machine: `post_process_tfrecords.py` (note: this is typically *not* done in parallel)
+ * Reading Time Machine: `post_process_tfrecords.py` (note: this is typically *not* done in parallel but can be if you have multiple tfrecords files -- only use number of processors <= number of tfrecords you have)
  * detectron2: `run_detectron2_batch.py` (see the `run_detectron2.ipynb` for more details)
  
 In *theory* one can also run a docker image of ScanBank (see `misc/`), but not on an M1 Mac, so moving on!
