@@ -69,6 +69,8 @@ Note: for this to work, you need to have java > 8 installed (should be in the co
  * Reading Time Machine: `post_process_tfrecords.py` (note: this is typically *not* done in parallel)
  * detectron2: `run_detectron2_batch.py` (see the `run_detectron2.ipynb` for more details)
  
+In *theory* one can also run a docker image of ScanBank (see `misc/`), but not on an M1 Mac, so moving on!
+ 
  
 ### 7. Check out metrics
 

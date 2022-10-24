@@ -1,14 +1,14 @@
 # for benchmarks, otherwise set to None
 # HTRC papers
 ocr_results_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/OCR_processing_htrc/'
-nRandom_ocr_image = 20 # for testing
+nRandom_ocr_image = 50 # for testing
 full_article_pdfs_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/data/htrc/pdfs/'
 images_jpeg_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/Pages_htrc/RandomSingleFromPDFIndexed/'
 tmp_storage_dir = None
 
 # cap the number of pages per article?
 # set to None if all pages
-max_pages = 20
+max_pages = 50
 
 
 
@@ -145,6 +145,8 @@ pdfarts = df['pdfarts'].values.astype('bool').tolist()
 pdfarts = pdfarts[0]
     
 wsInds = np.arange(0,len(ws))
+
+#import sys; sys.exit()
     
 # debug
 #wsInds = wsInds[:6]
@@ -269,7 +271,8 @@ if yt.is_root():
             color_bars.append(v[6])
             centers_in.append(v[7])
             centers_out.append(v[8])
-
+    #import sys; sys.exit()
+    print('in here have', len(wsout), 'articles')
         
     # do a little test save here - locations of squares and figure caption boxes
     with open(pickle_file_name, 'wb') as ff:

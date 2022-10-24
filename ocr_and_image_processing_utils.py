@@ -212,85 +212,13 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
                 # update lists
                 pdfs_todo[keys[ind]]['pages_left'] = pages
                 pages_done = pdfs_todo[keys[ind]]['pages_done']
+                if type(pages_done) != list:
+                    pages_done = pages_done.tolist()
                 pages_done.append(page)
                 pdfs_todo[keys[ind]]['pages_done'] = pages_done
                 
                 ws.append(full_article_pdfs_dir+keys[ind]+'.pdf'); pageNums.append(page)
             
-#             f = pdfarts[pdfRandInts[iloop%len(pdfarts)]] # from an article, grab a random page
-#             print(f)
-            
-#             import sys; sys.exit()
-#             # how many pages?
-#             parsed = True
-#             with open(f,'rb') as ff:
-#                 try:
-#                     parser = PDFParser(ff)
-#                 except:
-#                     print('cant parse parser', f)
-#                     parsed = False
-#                 if parsed:
-#                     try:
-#                         document = PDFDocument(parser)
-#                     except:
-#                         print('cant parse at resolve stage', f)
-#                         parsed = False
-#                     if parsed:
-#                         if resolve1(document.catalog['Pages']) is not None:
-#                             pages_count = resolve1(document.catalog['Pages'])['Count']  
-#                         else:
-#                             pages_count = 1
-            
-            
-            
-            
-            
-            
-#             if (iloop>=len(pdfarts)*max_pages_here): # assume ~10 pages per article
-#                 print('no more files!')
-#                 break
-#             f = pdfarts[pdfRandInts[iloop%len(pdfarts)]]
-#             # how many pages?
-#             parsed = True
-#             with open(f,'rb') as ff:
-#                 try:
-#                     parser = PDFParser(ff)
-#                 except:
-#                     print('cant parse parser', f)
-#                     parsed = False
-#                 if parsed:
-#                     try:
-#                         document = PDFDocument(parser)
-#                     except:
-#                         print('cant parse at resolve stage', f)
-#                         parsed = False
-#                     if parsed:
-#                         if resolve1(document.catalog['Pages']) is not None:
-#                             pages_count = resolve1(document.catalog['Pages'])['Count']  
-#                         else:
-#                             pages_count = 1
-#             # update max_pages
-#             if max_pages is None: max_pages_here = pages_count
-#             if parsed:
-#                 #print('pages count', pages_count)
-#                 # grab a random page
-#                 pageInt = np.random.choice(pages_count,pages_count,replace=False)
-#                 # check for already having
-#                 art = f.split('/')[-1].split('.pdf')[0] + '_p' + str(int(pageInt[0]))
-#                 iloop2 = 0
-#                 #print('art',art)
-#                 while (art in wsAlreadyDone):
-#                     #print('art here', art)
-#                     if (iloop2 >= pages_count): break
-#                     art = f.split('/')[-1].split('.pdf')[0] + '_p' + str(int(pageInt[iloop2]))
-#                     iloop2+=1
-#                 # append if found!
-#                 if iloop2-2 < pages_count: # didn't run out of pages
-#                     ws.append(f); pageNums.append(int(pageInt[iloop2-1]))
-                    
-#                 #print('pagenums', pageNums, 'len ws', len(ws))
-
-#             iloop += 1
         if is_root(): print('end loop to get pages of PDFs, len(ws)=',len(ws))
     else: # look for bitmaps or jpegs
         print('THIS IS CURRENTLY DEPRICATED!!')

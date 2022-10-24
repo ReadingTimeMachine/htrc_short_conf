@@ -658,7 +658,7 @@ def calc_prec_rec_f1_cv(TPv,FPv,FNv,LABELS,scoreminVec,iouminVec):
     return precision, precision_std, recall, recall_std, f1, f1_std
 
 
-def print_metrics_table(totalTrue,TP,FP,FN,
+def print_metrics_table_old(totalTrue,TP,FP,FN,
                         precision, precision_std, recall, recall_std,f1,f1_std,
                         LABELS, scoremin, n_folds_cv, ioumin_per_label):
     print('SCORE = ', scoremin, ' N_CV = ', n_folds_cv)
@@ -806,3 +806,102 @@ def calc_AP(truebox3,boxes_sq5,labels_sq5, scores_sq5,LABELS,
         apOut.append(ap)
         
     return apOut
+
+
+
+def print_metrics_table(LABELS,scoremin,ioumin_per_label,
+                        truebox3,boxes_sq5,labels_sq5, 
+                        scores_sq5,n_folds_cv=1,seed=None,
+                       print_out = True):
+    
+    #Shape is: (# labels, #scores, #ious, #CV folds)
+    TPs, FPs, FNs, totalTrues = calc_base_metrics_allboxes_cv(LABELS,scoremin,ioumin_per_label,
+                                                  truebox3,boxes_sq5,labels_sq5, 
+                                                  scores_sq5,n_folds_cv=n_folds_cv,
+                                                             seed=seed)
+    totalTrue = totalTrues.sum(axis=1).astype('int') # collapse onto 1 axis
+    TP = np.diagonal(TPs[:,0,:,:].sum(axis=2)) # sum across all CV, then for the right IOU
+    FP = np.diagonal(FPs[:,0,:,:].sum(axis=2)) # sum across all CV, then for the right IOU
+    FN = np.diagonal(FNs[:,0,:,:].sum(axis=2)) # sum across all CV, then for the right IOU
+    
+    aps = calc_AP(truebox3,boxes_sq5,labels_sq5, scores_sq5,LABELS, 
+            scoreMin = scoremin)
+    
+    precisions, precision_stds, recalls, \
+      recall_stds, f1s, f1_stds = calc_prec_rec_f1_cv(TPs,FPs,FNs,
+                                                   LABELS,scoremin,
+                                                   ioumin_per_label)
+    precision = np.diagonal(precisions[:,0,:]) 
+    precision_std = np.diagonal(precision_stds[:,0,:]) 
+    recall = np.diagonal(recalls[:,0,:]) 
+    recall_std = np.diagonal(recall_stds[:,0,:]) 
+    f1 = np.diagonal(f1s[:,0,:]) 
+    f1_std = np.diagonal(f1_stds[:,0,:]) 
+    
+    if print_out:
+        # only print "first" scoremin
+        print('SCORE = ', scoremin[0], ' N_CV = ', n_folds_cv)
+
+        labelsMetric = ['Metric']
+        labelsMetric.extend(LABELS)
+        spacing = '%-15s'
+        strOut = ' '.join([spacing % (i,) for i in labelsMetric])
+        print(strOut)
+
+        out = ['iou cut']
+        for i in range(len(LABELS)):
+            out.append( str(ioumin_per_label[i]) )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        out = ['# of objs']
+        for i in range(len(LABELS)):
+            out.append( str(totalTrue[i]) )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        print('--------------------------------------------------------------------------------------------')
+
+        out = ['TP']
+        for i in range(len(LABELS)):
+            out.append( str(round(TP[i]/totalTrue[i]*100,1))+'%' )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        out = ['FP']
+        for i in range(len(LABELS)):
+            out.append( str(round(FP[i]/totalTrue[i]*100,1))+'%' )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        out = ['FN']
+        for i in range(len(LABELS)):
+            out.append( str(round(FN[i]/totalTrue[i]*100,1))+'%' )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        print('--------------------------------------------------------------------------------------------')
+        out = ['Precision'] # accuracy of positive predictions => number of true positives out of all of the things we label as positive
+        for i in range(len(LABELS)):
+            #iind = np.where(iouminVec == ioumin_per_label[i])[0]
+            #out.append( str(np.round(precision[i,sind,iind][0],1))+'+/-' +str(np.round(precision_std[i,sind,iind][0],1))+ '%' )
+            out.append( str(np.round(precision[i],1))+'+/-' +str(np.round(precision_std[i],1))+ '%' )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        out = ['Recall'] # true positive rate => number of true positives over all of the things that SHOULD be positive
+        for i in range(len(LABELS)):
+            #iind = np.where(iouminVec == ioumin_per_label[i])[0]
+            out.append( str(np.round(recall[i],1))+'+/-' +str(np.round(recall_std[i],1))+ '%' )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+
+        out = ['F1']
+        for i in range(len(LABELS)):
+            #iind = np.where(iouminVec == ioumin_per_label[i])[0]
+            out.append( str(np.round(f1[i],1))+'+/-' +str(np.round(f1_std[i],1))+ '%' )
+        strOut = ' '.join([spacing % (i,) for i in out])
+        print(strOut)
+        
+    return TP,FP,FN,precision, precision_std, recall, recall_std,f1,f1_std,aps
+    
