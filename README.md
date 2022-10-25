@@ -41,10 +41,12 @@ You will also need to download the trained weights [which you can get from the l
 ### 1. Download papers from HTRC
 
 So far the list is:
- * https://babel.hathitrust.org/cgi/pt?id=uiug.30112101602172&view=1up&seq=16&skin=2021 (1963)
- * https://babel.hathitrust.org/cgi/pt?id=osu.32435023323769&view=1up&seq=199 (1985)
- * https://babel.hathitrust.org/cgi/pt?id=uc1.31210014680225&view=1up&seq=1 (2003)
- * https://babel.hathitrust.org/cgi/pt?id=uc1.32106020677263&view=1up&seq=158 (1989)
+ * https://babel.hathitrust.org/cgi/pt?id=uiug.30112101602172 (1963)
+ * https://babel.hathitrust.org/cgi/pt?id=osu.32435023323769 (1985)
+ * https://babel.hathitrust.org/cgi/pt?id=uc1.31210014680225 (2003)
+ * https://babel.hathitrust.org/cgi/pt?id=uc1.32106020677263 (1989)
+ * https://babel.hathitrust.org/cgi/pt?id=mdp.39015021746196 (1964)
+ * https://hdl.handle.net/2027/uc1.32106020742166 (1970)
  
 ### 2. Run OCR 
 
