@@ -192,32 +192,37 @@ def get_random_page_list(wsAlreadyDone, full_article_pdfs_dir=None,
         while (len(ws) < nRandom_ocr_image): # stop after we have enough pages
             # grab random paper
             keys = list(pdfs_todo.keys())
-            ind = np.random.randint(0,len(keys)) # get pdf names
-            # find out how many pages left:
-            pages_left = pdfs_todo[keys[ind]]['pages_left']
-            # if zero, remove this entry from the options
-            if len(pages_left) == 0:
-                if verbose: print('removing ', pdfs_todo[keys[ind]], 'as no pages left:', pages_left)
-                del pdfs_todo[keys[ind]]
-                continue # resume loop
-            elif max_pages is not None and len(pdfs_todo[keys[ind]]['pages_done']) >= max_pages:
-                del pdfs_todo[keys[ind]]
-                continue # resume loop                
-            else: # go on...
-                # which page?
-                pages = pdfs_todo[keys[ind]]['pages_left']
-                page_ind = np.random.randint(0,len(pages))
-                #print(page_ind)
-                page = pages.pop(page_ind)
-                # update lists
-                pdfs_todo[keys[ind]]['pages_left'] = pages
-                pages_done = pdfs_todo[keys[ind]]['pages_done']
-                if type(pages_done) != list:
-                    pages_done = pages_done.tolist()
-                pages_done.append(page)
-                pdfs_todo[keys[ind]]['pages_done'] = pages_done
-                
-                ws.append(full_article_pdfs_dir+keys[ind]+'.pdf'); pageNums.append(page)
+            if keys is not None and len(keys)>0:
+                #print(keys, len(keys))
+                ind = np.random.randint(0,len(keys)) # get pdf names
+                # find out how many pages left:
+                pages_left = pdfs_todo[keys[ind]]['pages_left']
+                # if zero, remove this entry from the options
+                if len(pages_left) == 0:
+                    if verbose: print('removing ', pdfs_todo[keys[ind]], 'as no pages left:', pages_left)
+                    del pdfs_todo[keys[ind]]
+                    continue # resume loop
+                elif max_pages is not None and len(pdfs_todo[keys[ind]]['pages_done']) >= max_pages:
+                    del pdfs_todo[keys[ind]]
+                    continue # resume loop                
+                else: # go on...
+                    # which page?
+                    pages = pdfs_todo[keys[ind]]['pages_left']
+                    page_ind = np.random.randint(0,len(pages))
+                    #print(page_ind)
+                    page = pages.pop(page_ind)
+                    # update lists
+                    pdfs_todo[keys[ind]]['pages_left'] = pages
+                    pages_done = pdfs_todo[keys[ind]]['pages_done']
+                    if type(pages_done) != list:
+                        pages_done = pages_done.tolist()
+                    pages_done.append(page)
+                    pdfs_todo[keys[ind]]['pages_done'] = pages_done
+
+                    ws.append(full_article_pdfs_dir+keys[ind]+'.pdf'); pageNums.append(page)
+            else:
+                print('no more pdfs with this max_page, nRandom_ocr_image combination')
+                break
             
         if is_root(): print('end loop to get pages of PDFs, len(ws)=',len(ws))
     else: # look for bitmaps or jpegs

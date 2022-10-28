@@ -1,14 +1,14 @@
 # for benchmarks, otherwise set to None
 # HTRC papers
 ocr_results_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/OCR_processing_htrc/'
-nRandom_ocr_image = 50 # for testing
+nRandom_ocr_image = 100 # for testing
 full_article_pdfs_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/data/htrc/pdfs/'
 images_jpeg_dir = '/Users/jnaiman/Dropbox/wwt_image_extraction/FigureLocalization/BenchMarks/Pages_htrc/RandomSingleFromPDFIndexed/'
 tmp_storage_dir = None
 
 # cap the number of pages per article?
 # set to None if all pages
-max_pages = 50
+max_pages = 100
 
 
 
@@ -99,8 +99,10 @@ def create_files(lock):
         # Get all already done pages... 
         wsAlreadyDone = get_already_ocr_processed(ocr_results_dir=ocr_results_dir)
 
-        if yt.is_root(): print('working with pickle file:', pickle_file_name)
-
+        if yt.is_root(): 
+            print('working with pickle file:', pickle_file_name)
+            os.remove(tmp_storage_dir + 'ocr_list.csv')
+            
         pdfarts = None
 
         # get randomly selected articles and pages

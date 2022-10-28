@@ -34,6 +34,7 @@ import warnings
 import cv2
 import tqdm
 import pickle
+import pandas as pd
 
 from detectron2.config import get_cfg
 from detectron2.data.detection_utils import read_image
@@ -124,15 +125,41 @@ predictor = DefaultPredictor(cfg)
 # get pages
 #pages = glob(pages_dir + '*')
 
-# make sure to have same files as our process
+# # make sure to have same files as our process
+# ocrFiles = get_all_ocr_files(ocr_results_dir=ocr_results_dir)
+# # get important quantities from these files
+# if yt.is_root(): print('retreiving OCR data, this can take a moment...')
+# ws, paragraphs, squares, html, rotations,colorbars = collect_ocr_process_results(ocrFiles)
+# ws = np.unique(ws)
+# pages = []
+# for w in ws:
+#     pages.append(images_jpeg_dir + w)
+
+    
+# get make sense info -- match up only annotated things
+# let's get all of the ocr files
 ocrFiles = get_all_ocr_files(ocr_results_dir=ocr_results_dir)
 # get important quantities from these files
 if yt.is_root(): print('retreiving OCR data, this can take a moment...')
 ws, paragraphs, squares, html, rotations,colorbars = collect_ocr_process_results(ocrFiles)
-ws = np.unique(ws)
+# create dataframe
+df = pd.DataFrame({'ws':ws, 'paragraphs':paragraphs, 'squares':squares, 
+                   'hocr':html, 'rotation':rotations, 'colorbars':colorbars})#, 'pdfwords':pdfwords})
+df = df.drop_duplicates(subset='ws')
+df = df.set_index('ws')
+dfMakeSense = get_makesense_info_and_years(df,make_sense_dir=make_sense_dir)
+LABELS = []
+for s in dfMakeSense['squares'].values:
+    for ss in s:
+        LABELS.append(ss[-1])
+LABELS = np.unique(LABELS).tolist()
+# storage
+#my_storage = {}
+#wsInds = np.linspace(0,len(dfMakeSense['filename'].values)-1,len(dfMakeSense['filename'].values)).astype('int')
+
 pages = []
-for w in ws:
-    pages.append(images_jpeg_dir + w)
+for w in dfMakeSense['filename'].values:
+    pages.append(images_jpeg_dir + w + '.jpeg')
 
 my_storage = {}
 
